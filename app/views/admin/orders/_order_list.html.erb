@@ -1,0 +1,10 @@
+<% @orders.each do |order| %>
+  <tr>
+	<td><%= check_box_tag 'delete' , order.id, false, {:name => "order_ids", :id => order.id} %></td>
+    <td><%= order.created_at.to_date %></td>
+    <td><%= link_to order.number, object_url(order) %></td>
+    <td><%= t(order.state.downcase) %></td>
+    <td><%= order.user.email if order.user %></td>
+    <td><%= number_to_currency order.total %></td>
+  </tr>
+<% end %>

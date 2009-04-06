@@ -1,0 +1,117 @@
+<% content_for :head do -%>
+  <%= calendar_date_select_includes %>
+  <script type="text/javascript">
+	function do_delete(){
+		var orderList = [];
+		var x  = $$('input:checked[type=checkbox][name=order_ids]');
+		if(x.length > 0) {
+			x.each(function (item){
+				orderList.push(item.value);
+			});
+			var answer = confirm("Are you sure you want to delete order(s):\n" + orderList.join("\n"));
+		
+			if(answer == true){
+				new Ajax.Request('orders/delete', 
+				{	asynchronous:true, 
+					evalScripts:true,
+				 	method:'delete', 
+					parameters: {'authenticity_token': '<%= form_authenticity_token %>', 
+								 'order_ids': orderList.toString(),
+								 'search[page]' : '<%= @search.page %>'
+								}
+				}); return false;
+			}
+		}
+	};
+  </script>
+<% end -%>
+
+<h1><%= t("listing_orders") %></h1>
+
+<table class="index">
+  <thead>
+    <tr>
+	  <th><%= link_to_function t("delete"), "do_delete()" %></th>
+      <th><%= order_by_link :created_at, :text => t("order_date") %></th>
+      <th><%= order_by_link :number, :text => t("order_number") %></th>
+      <th><%= order_by_link :state, :text => t("status") %></th>
+      <th><%= order_by_link({:user => :email}, :text => t("customer")) %></th>
+      <th><%= order_by_link :total, :text =>t("total") %></th>
+    </tr>
+  </thead>
+  <tbody id="test_tbody">
+  <% @orders.each do |order| %>
+    <tr>
+	  <td><%= check_box_tag 'delete' , order.id, false, {:name => "order_ids", :id => order.id} %></td>
+      <td><%= order.created_at.to_date %></td>
+      <td><%= link_to order.number, object_url(order) %></td>
+      <td><%= t(order.state.downcase) %></td>
+      <td><%= order.user.email if order.user %></td>
+      <td><%= number_to_currency order.total %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<%= page_links(:prev => "&#171; #{t('previous')}", :next => "#{t('next')} &#187;") if @search.page_count > 1 %>
+        
+        
+        
+<% content_for :sidebar do %>      
+<div class="box">
+  <h3><%= t(:search) %></h3>
+
+  <% form_for [:admin, @search] do |f| %>
+  	<% f.fields_for @search.conditions do |orders| %>
+
+      <label><%= t("date_range") %></label><br />
+      <div class="yui-g date-range-filter">
+        <div class="yui-u sub-field first">
+          <%= orders.calendar_date_select :created_at_after %><br />
+          <label class="sub"><%= t("start") %></label>
+        </div>
+        <div class="yui-u sub-field">
+          <%= orders.calendar_date_select :created_at_before %><br />
+          <label><%= t("stop") %></label>
+        </div>
+      </div>
+
+      <p><label><%= t("order_number") %></label><br />
+      <%= orders.text_field :number, :size=>25 %></p>
+
+      <p><label><%= t("status") %></label><br />
+      <%= orders.select :state, Order.state_machines['state'].states.collect {|status| [status.titleize, status]}, {:include_blank => true} %></p>
+
+      <% orders.fields_for orders.object.user do |user| %>
+        <p>
+          <label><%= t("email") %></label><br />
+          <%= user.text_field :email, :size=>25 %>
+        </p>
+      <% end %>
+      <% orders.fields_for orders.object.creditcards do |cc| %>
+      	<% cc.fields_for cc.object.address do |address| %>
+        <p>
+          <label><%= t("first_name") %></label><br />
+            <%= address.text_field :lower_of_firstname_contains, :size=>25 %>
+        </p>
+        <p>
+          <label><%= t("last_name") %></label><br />
+          <%= address.text_field :lower_of_lastname_contains, :size=>25 %>
+        </p>
+      <% end %>
+      <% end %>
+
+      <p>
+        <label>
+          <%= orders.check_box :checkout_complete, {:style => "vertical-align:middle;"}, "1", "" %>
+          <%= t("show_only_complete_orders") %>
+        </label>
+      </p>
+
+      <p><%= button t("search") %></p>
+
+    <% end %>
+
+  <% end %>
+
+</div>
+<% end %>
