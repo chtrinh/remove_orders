@@ -35,7 +35,7 @@ class RemoveOrdersExtension < Spree::Extension
               page << "if($('notice') != null){"
               page.visual_effect :pulsate, 'notice', {:pulses => 1, :duration => 2}
               page << '}else{'
-              page.insert_html :top , 'content', "<div class='flash notice' id='notice'>  #{t('Delete Orders successful')}</div>"
+              page.insert_html :top , 'content', "<div class='flash notice' id='notice'>#{t('delete_orders_successful')}</div>"
               page << '}'
             end
           }
