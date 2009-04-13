@@ -8,13 +8,13 @@ Allowing you to permanently deleted orders from the database.
 
 1. script/extension install git://github.com/chtrinh/remove_orders.git
 
-## NOTES - TODO
+## TODO
 
-TODO - Check if user has the correct user previlages (ie. admin) to call the function *might be irrelevant*
-     - Should only enable during development/test ENV?
-     - When users delete last order on pagination page, it should redirect to previous page, currently just shows nothing.
-     - Consider adding a (all) or (none) checkbox selector link. Suggestions?
-     - Refactor/DRY up code to be a better fit for future releases.
+	- Check if user has the correct user previlages (ie. admin) to call the function *might be irrelevant*
+	- Should only enable during development/test ENV?
+	- When users delete last order on pagination page, it should redirect to previous page, currently just shows nothing.
+	- Consider adding a (all) or (none) checkbox selector link. Suggestions?
+	- Refactor/DRY up code to be a better fit for future releases.
 
 ## Warning 
 
